@@ -1,3 +1,4 @@
+import 'screens/unit_converter_screen.dart';
 import 'screens/scientific_calculator_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -121,6 +122,24 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
+    ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      icon: const Icon(Icons.swap_horiz),
+      label: const Text("محول الوحدات الشامل", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const UnitConverterScreen()),
+        );
+      },
+    ),
+
 
     ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
