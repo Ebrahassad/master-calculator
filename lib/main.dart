@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(widget.isArabic ? 'سجل الجلسات السابقة' : 'Session History'),
         content: SizedBox(
           width: double.maxFinite,
-          child: const SizedBox()
+          child: false
               
               ? Text(widget.isArabic ? 'لا توجد عمليات سابقة مسجلة' : 'No history records found')
               : ListView.builder(
