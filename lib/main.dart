@@ -106,11 +106,33 @@ class _HomeScreenState extends State<HomeScreen> {
   Color _backgroundColor = Colors.teal;
   int _selectedIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final colorValue = prefs.getInt('bg_color');
+    if (colorValue != null) {
+      setState(() {
+        _backgroundColor = Color(colorValue);
+      });
+    }
+  }
+
+  Future<void> _saveBackgroundColor(Color color) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('bg_color', color.value);
+  }
+
   void _showColorPicker() {
     HapticFeedback.selectionClick();
     setState(() {
       _backgroundColor = _backgroundColor == Colors.teal ? Colors.indigo : Colors.teal;
     });
+    _saveBackgroundColor(_backgroundColor);
   }
 
   void _showHistoryDialog() {
@@ -203,14 +225,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.color_lens_rounded),
-            onPressed: _showColorPicker,
-            tooltip: widget.isArabic ? 'تغيير اللون' : 'Change Color',
-          ),
-          IconButton(
-            icon: const Icon(Icons.language_rounded),
-            onPressed: widget.onToggleLang,
-            tooltip: widget.isArabic ? 'Switch to English' : 'التحويل إلى العربية',
+            icon: const Icon(Icons.calculate),
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ScientificCalculatorScreen()));
+            },
+            tooltip: widget.isArabic ? 'الآلة الحاسبة العلمية' : 'Scientific Calculator',
           ),
         ],
       ),
@@ -244,13 +264,14 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.calculate),
-              title: Text(widget.isArabic ? 'الآلة الحاسبة العلمية الهندسية' : 'Scientific Calculator'),
-              onTap: () {
-                HapticFeedback.selectionClick();
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const ScientificCalculatorScreen()));
-              },
+              leading: const Icon(Icons.color_lens_rounded),
+              title: Text(widget.isArabic ? 'تغيير لون الخلفية' : 'Change Background Color'),
+              onTap: _showColorPicker,
+            ),
+            ListTile(
+              leading: const Icon(Icons.language_rounded),
+              title: Text(widget.isArabic ? 'التحويل إلى الإنجليزية' : 'Switch to English / Arabic'),
+              onTap: widget.onToggleLang,
             ),
             const Divider(),
             ListTile(
@@ -343,7 +364,7 @@ class _FinancialModuleState extends State<FinancialModule> {
       _vatResult = amt * (rate / 100);
       _totalWithVat = amt + _vatResult;
     });
-    widget.onCalculate('VAT Total: \${_totalWithVat.toStringAsFixed(2)}');
+    widget.onCalculate('VAT Total: ${_totalWithVat.toStringAsFixed(2)}');
   }
 
   void _calculateLoan() {
@@ -363,7 +384,7 @@ class _FinancialModuleState extends State<FinancialModule> {
         _totalInterest = (_monthlyInstallment * months) - principal;
       }
       setState(() {});
-      widget.onCalculate('Loan EMI: \${_monthlyInstallment.toStringAsFixed(2)}');
+      widget.onCalculate('Loan EMI: ${_monthlyInstallment.toStringAsFixed(2)}');
     }
   }
 
@@ -375,7 +396,7 @@ class _FinancialModuleState extends State<FinancialModule> {
     setState(() {
       _netSalary = (basic + allowances) - deductions;
     });
-    widget.onCalculate('Net Salary: \${_netSalary.toStringAsFixed(2)}');
+    widget.onCalculate('Net Salary: ${_netSalary.toStringAsFixed(2)}');
   }
 
   @override
@@ -437,9 +458,9 @@ class _FinancialModuleState extends State<FinancialModule> {
                   decoration: BoxDecoration(color: Colors.indigo.shade50, borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
-                      Text('\${widget.isArabic ? "قيمة الضريبة:" : "VAT Amount:"} \${_vatResult.toStringAsFixed(2)}'),
+                      Text('${widget.isArabic ? "قيمة الضريبة:" : "VAT Amount:"} ${_vatResult.toStringAsFixed(2)}'),
                       const Divider(),
-                      Text('\${widget.isArabic ? "الإجمالي الشامل:" : "Total:"} \${_totalWithVat.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo)),
+                      Text('${widget.isArabic ? "الإجمالي الشامل:" : "Total:"} ${_totalWithVat.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo)),
                     ],
                   ),
                 )
@@ -477,10 +498,10 @@ class _FinancialModuleState extends State<FinancialModule> {
                   decoration: BoxDecoration(color: Colors.teal.shade50, borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
-                      Text('\${widget.isArabic ? "القسط الشهري:" : "Monthly EMI:"} \${_monthlyInstallment.toStringAsFixed(2)}',
+                      Text('${widget.isArabic ? "القسط الشهري:" : "Monthly EMI:"} ${_monthlyInstallment.toStringAsFixed(2)}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.teal)),
                       const Divider(),
-                      Text('\${widget.isArabic ? "إجمالي الفوائد:" : "Total Interest:"} \${_totalInterest.toStringAsFixed(2)}'),
+                      Text('${widget.isArabic ? "إجمالي الفوائد:" : "Total Interest:"} ${_totalInterest.toStringAsFixed(2)}'),
                     ],
                   ),
                 ),
@@ -548,7 +569,7 @@ class _FinancialModuleState extends State<FinancialModule> {
                   decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(8)),
                   child: Center(
                     child: Text(
-                      '\${widget.isArabic ? "صافي الراتب:" : "Net Salary:"} \${_netSalary.toStringAsFixed(2)}',
+                      '${widget.isArabic ? "صافي الراتب:" : "Net Salary:"} ${_netSalary.toStringAsFixed(2)}',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.green),
                     ),
                   ),
@@ -625,7 +646,7 @@ class _HealthModuleState extends State<HealthModule> {
         _bmiValue = bmi;
         _bmiStatus = status;
       });
-      widget.onCalculate('BMI: \${bmi.toStringAsFixed(1)} (\$status)');
+      widget.onCalculate('BMI: ${bmi.toStringAsFixed(1)} ($status)');
     }
   }
 
@@ -639,7 +660,7 @@ class _HealthModuleState extends State<HealthModule> {
       setState(() {
         _dailyCalories = bmr * 1.375;
       });
-      widget.onCalculate('Calories: \${_dailyCalories.toStringAsFixed(0)} kcal');
+      widget.onCalculate('Calories: ${_dailyCalories.toStringAsFixed(0)} kcal');
     }
   }
 
@@ -650,7 +671,7 @@ class _HealthModuleState extends State<HealthModule> {
       setState(() {
         _avgBloodSugar = (28.7 * a1c) - 46.7;
       });
-      widget.onCalculate('HbA1c: \$a1c%, eAG: \${_avgBloodSugar.toStringAsFixed(1)} mg/dL');
+      widget.onCalculate('HbA1c: $a1c%, eAG: ${_avgBloodSugar.toStringAsFixed(1)} mg/dL');
     }
   }
 
@@ -661,7 +682,7 @@ class _HealthModuleState extends State<HealthModule> {
       setState(() {
         _waterLiters = (w * 35) / 1000;
       });
-      widget.onCalculate('Water Intake: \${_waterLiters.toStringAsFixed(2)} Liters');
+      widget.onCalculate('Water Intake: ${_waterLiters.toStringAsFixed(2)} Liters');
     }
   }
 
@@ -728,7 +749,7 @@ class _HealthModuleState extends State<HealthModule> {
                     decoration: BoxDecoration(color: Colors.teal.shade50, borderRadius: BorderRadius.circular(8)),
                     child: Column(
                       children: [
-                        Text('BMI: \${_bmiValue.toStringAsFixed(1)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
+                        Text('BMI: ${_bmiValue.toStringAsFixed(1)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
                         const SizedBox(height: 4),
                         Text(_bmiStatus, style: const TextStyle(fontWeight: FontWeight.w500)),
                       ],
@@ -768,7 +789,7 @@ class _HealthModuleState extends State<HealthModule> {
                     decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
-                        '\${widget.isArabic ? "احتياجك اليومي:" : "Daily Need:"} \${_dailyCalories.toStringAsFixed(0)} \${widget.isArabic ? "سعرة حرارية" : "kcal"}',
+                        '${widget.isArabic ? "احتياجك اليومي:" : "Daily Need:"} ${_dailyCalories.toStringAsFixed(0)} ${widget.isArabic ? "سعرة حرارية" : "kcal"}',
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 16),
                       ),
                     ),
@@ -801,7 +822,7 @@ class _HealthModuleState extends State<HealthModule> {
                     decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
-                        '\${widget.isArabic ? "متوسط السكر التقديري (eAG):" : "Estimated Avg Glucose:"}\n\${_avgBloodSugar.toStringAsFixed(1)} mg/dL',
+                        '${widget.isArabic ? "متوسط السكر التقديري (eAG):" : "Estimated Avg Glucose:"}\n${_avgBloodSugar.toStringAsFixed(1)} mg/dL',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 16),
                       ),
@@ -835,7 +856,7 @@ class _HealthModuleState extends State<HealthModule> {
                     decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
-                        '\${widget.isArabic ? "الكمية اليومية اللازمة:" : "Daily Water Intake:"}\n\${_waterLiters.toStringAsFixed(2)} \${widget.isArabic ? "لتر" : "Liters"}',
+                        '${widget.isArabic ? "الكمية اليومية اللازمة:" : "Daily Water Intake:"}\n${_waterLiters.toStringAsFixed(2)} ${widget.isArabic ? "لتر" : "Liters"}',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16),
                       ),
@@ -883,7 +904,7 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
       _savedAmount = price * (disc / 100);
       _finalPrice = price - _savedAmount;
     });
-    widget.onCalculate('Discount Final: \${_finalPrice.toStringAsFixed(2)}');
+    widget.onCalculate('Discount Final: ${_finalPrice.toStringAsFixed(2)}');
   }
 
   void _convertStorage() {
@@ -893,7 +914,7 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
       _mbResult = gb * 1024;
       _kbResult = gb * 1024 * 1024;
     });
-    widget.onCalculate('Storage MB: \${_mbResult.toStringAsFixed(0)}');
+    widget.onCalculate('Storage MB: ${_mbResult.toStringAsFixed(0)}');
   }
 
   Future<void> _pickBirthDate(BuildContext context) async {
@@ -924,7 +945,7 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
         _calculatedMonths = months;
         _calculatedDays = days;
       });
-      widget.onCalculate('Age: \$_calculatedYears years, \$_calculatedMonths months');
+      widget.onCalculate('Age: $_calculatedYears years, $_calculatedMonths months');
     }
   }
 
@@ -987,9 +1008,9 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
                   decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
-                      Text('\${widget.isArabic ? "مقدار التوفير:" : "You Save:"} \${_savedAmount.toStringAsFixed(2)}'),
+                      Text('${widget.isArabic ? "مقدار التوفير:" : "You Save:"} ${_savedAmount.toStringAsFixed(2)}'),
                       const Divider(),
-                      Text('\${widget.isArabic ? "السعر النهائي:" : "Final Price:"} \${_finalPrice.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                      Text('${widget.isArabic ? "السعر النهائي:" : "Final Price:"} ${_finalPrice.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
                     ],
                   ),
                 )
@@ -1020,9 +1041,9 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
                   decoration: BoxDecoration(color: Colors.purple.shade50, borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
-                      Text('MB: \${_mbResult.toStringAsFixed(0)}'),
+                      Text('MB: ${_mbResult.toStringAsFixed(0)}'),
                       const Divider(),
-                      Text('KB: \${_kbResult.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
+                      Text('KB: ${_kbResult.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
                     ],
                   ),
                 )
@@ -1059,8 +1080,8 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
                     child: Center(
                       child: Text(
                         widget.isArabic
-                            ? 'عمرك هو:\n\$_calculatedYears سنة، \$_calculatedMonths أشهر، و\$_calculatedDays يوم'
-                            : 'Your Age:\n\$_calculatedYears Years, \$_calculatedMonths Months, \$_calculatedDays Days',
+                            ? 'عمرك هو:\n$_calculatedYears سنة، $_calculatedMonths أشهر، و$_calculatedDays يوم'
+                            : 'Your Age:\n$_calculatedYears Years, $_calculatedMonths Months, $_calculatedDays Days',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo, fontSize: 16),
                       ),
