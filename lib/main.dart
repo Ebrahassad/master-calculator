@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ==========================================
-// 1. FINANCIAL MODULE (VAT, Loan, Salary)
+// 1. FINANCIAL MODULE (Dropdown Selector)
 // ==========================================
 class FinancialModule extends StatefulWidget {
   final bool isArabic;
@@ -117,6 +117,8 @@ class FinancialModule extends StatefulWidget {
 }
 
 class _FinancialModuleState extends State<FinancialModule> {
+  int _selectedCalc = 0; // 0: VAT, 1: Loan
+
   // VAT Controllers
   final TextEditingController _vatAmountController = TextEditingController();
   final TextEditingController _vatRateController = TextEditingController(text: '15');
@@ -148,24 +150,52 @@ class _FinancialModuleState extends State<FinancialModule> {
         _monthlyInstallment = principal / months;
         _totalInterest = 0;
       } else {
-        _monthlyInstallment = (principal * monthlyRate * pow(1 + monthlyRate, months.toDouble())) /
-            (pow(1 + monthlyRate, months.toDouble()) - 1);
+        _monthlyInstallment = (principal * monthlyRate * SystemMath.pow(1 + monthlyRate, months.toDouble())) /
+            (SystemMath.pow(1 + monthlyRate, months.toDouble()) - 1);
         _totalInterest = (_monthlyInstallment * months) - principal;
       }
       setState(() {});
     }
   }
 
-  double pow(double base, double exponent) {
-    return SystemMath.pow(base, exponent);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Padding(
       padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          DropdownButtonFormField<int>(
+            value: _selectedCalc,
+            decoration: InputDecoration(
+              labelText: widget.isArabic ? 'اختر الحاسبة المالية' : 'Select Financial Calculator',
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            items: [
+              DropdownMenuItem(
+                value: 0,
+                child: Text(widget.isArabic ? 'حاسبة ضريبة القيمة المضافة (VAT)' : 'VAT Calculator'),
+              ),
+              DropdownMenuItem(
+                value: 1,
+                child: Text(widget.isArabic ? 'حاسبة القروض والأقساط (Loan & EMI)' : 'Loan & EMI Calculator'),
+              ),
+            ],
+            onChanged: (val) => setState(() => _selectedCalc = val!),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _selectedCalc == 0 ? _buildVatView() : _buildLoanView(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVatView() {
+    return ListView(
       children: [
-        // VAT Card
         Card(
           elevation: 2,
           child: Padding(
@@ -173,25 +203,22 @@ class _FinancialModuleState extends State<FinancialModule> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.isArabic ? 'حاسبة ضريبة القيمة المضافة' : 'VAT Calculator',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.indigo)),
-                const SizedBox(height: 12),
                 TextField(controller: _vatAmountController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'المبلغ الأساسي' : 'Base Amount', border: const OutlineInputBorder())),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(controller: _vatRateController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'نسبة الضريبة (%)' : 'VAT Rate (%)', border: const OutlineInputBorder())),
-                const SizedBox(height: 12),
-                ElevatedButton(onPressed: _calculateVat, child: Text(widget.isArabic ? 'حساب الضريبة' : 'Calculate VAT')),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _calculateVat, child: Text(widget.isArabic ? 'حساب الضريبة' : 'Calculate VAT'))),
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(color: Colors.indigo.shade50, borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  child: Column(
                     children: [
-                      Text('${widget.isArabic ? "الضريبة:" : "VAT:"} ${_vatResult.toStringAsFixed(2)}'),
-                      Text('${widget.isArabic ? "الإجمالي:" : "Total:"} ${_totalWithVat.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text('${widget.isArabic ? "قيمة الضريبة:" : "VAT Amount:"} ${_vatResult.toStringAsFixed(2)}'),
+                      const Divider(),
+                      Text('${widget.isArabic ? "الإجمالي الشامل:" : "Total with VAT:"} ${_totalWithVat.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo)),
                     ],
                   ),
                 )
@@ -199,8 +226,13 @@ class _FinancialModuleState extends State<FinancialModule> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        // Loan Calculator Card
+      ],
+    );
+  }
+
+  Widget _buildLoanView() {
+    return ListView(
+      children: [
         Card(
           elevation: 2,
           child: Padding(
@@ -208,27 +240,25 @@ class _FinancialModuleState extends State<FinancialModule> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.isArabic ? 'حاسبة القروض والأقساط' : 'Loan & EMI Calculator',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.indigo)),
-                const SizedBox(height: 12),
                 TextField(controller: _loanAmountController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'مبلغ القرض' : 'Loan Amount', border: const OutlineInputBorder())),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(controller: _loanInterestController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'نسبة الفائدة السنوية (%)' : 'Annual Interest (%)', border: const OutlineInputBorder())),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(controller: _loanYearsController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'المدة (بالسنوات)' : 'Duration (Years)', border: const OutlineInputBorder())),
-                const SizedBox(height: 12),
-                ElevatedButton(onPressed: _calculateLoan, child: Text(widget.isArabic ? 'حساب القسط الشهري' : 'Calculate EMI')),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _calculateLoan, child: Text(widget.isArabic ? 'حساب القسط الشهري' : 'Calculate EMI'))),
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(color: Colors.teal.shade50, borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
                       Text('${widget.isArabic ? "القسط الشهري:" : "Monthly EMI:"} ${_monthlyInstallment.toStringAsFixed(2)}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.teal)),
+                      const Divider(),
                       Text('${widget.isArabic ? "إجمالي الفوائد:" : "Total Interest:"} ${_totalInterest.toStringAsFixed(2)}'),
                     ],
                   ),
@@ -242,7 +272,7 @@ class _FinancialModuleState extends State<FinancialModule> {
   }
 }
 
-// مساعد لحساب الأسس في القرض
+// مساعد الرياضيات للأسس
 class SystemMath {
   static double pow(double base, double exponent) {
     if (exponent == 0) return 1;
@@ -255,7 +285,7 @@ class SystemMath {
 }
 
 // ==========================================
-// 2. HEALTH MODULE (BMI & Calories)
+// 2. HEALTH MODULE (Dropdown Selector)
 // ==========================================
 class HealthModule extends StatefulWidget {
   final bool isArabic;
@@ -266,13 +296,15 @@ class HealthModule extends StatefulWidget {
 }
 
 class _HealthModuleState extends State<HealthModule> {
-  // BMI Controllers
+  int _selectedCalc = 0; // 0: BMI, 1: Calories
+
+  // BMI
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   double _bmiValue = 0.0;
   String _bmiStatus = '';
 
-  // Calorie Controllers
+  // Calories
   final TextEditingController _calWeight = TextEditingController();
   final TextEditingController _calHeight = TextEditingController();
   final TextEditingController _calAge = TextEditingController();
@@ -286,13 +318,13 @@ class _HealthModuleState extends State<HealthModule> {
       double bmi = w / (hM * hM);
       String status = '';
       if (bmi < 18.5) {
-        status = widget.isArabic ? 'نقص في الوزن' : 'Underweight';
+        status = widget.isArabic ? 'نقص في الوزن (Underweight)' : 'Underweight';
       } else if (bmi < 25) {
-        status = widget.isArabic ? 'وزن مثالي وطبيعي' : 'Normal Weight';
+        status = widget.isArabic ? 'وزن مثالي وطبيعي (Normal)' : 'Normal Weight';
       } else if (bmi < 30) {
-        status = widget.isArabic ? 'زيادة في الوزن' : 'Overweight';
+        status = widget.isArabic ? 'زيادة في الوزن (Overweight)' : 'Overweight';
       } else {
-        status = widget.isArabic ? 'سمنة مفرطة' : 'Obese';
+        status = widget.isArabic ? 'سمنة مفرطة (Obese)' : 'Obese';
       }
       setState(() {
         _bmiValue = bmi;
@@ -306,47 +338,68 @@ class _HealthModuleState extends State<HealthModule> {
     double h = double.tryParse(_calHeight.text) ?? 0.0;
     double age = double.tryParse(_calAge.text) ?? 0.0;
     if (w > 0 && h > 0 && age > 0) {
-      // معادلة هريس-بينديكت المبسطة للرجال/النساء (BMR) مع نشاط متوسط
       double bmr = 10 * w + 6.25 * h - 5 * age + 5;
       setState(() {
-        _dailyCalories = bmr * 1.375; // نشاط خفيف إلى معتدل
+        _dailyCalories = bmr * 1.375;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Padding(
       padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          DropdownButtonFormField<int>(
+            value: _selectedCalc,
+            decoration: InputDecoration(
+              labelText: widget.isArabic ? 'اختر حاسبة الصحة' : 'Select Health Calculator',
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            items: [
+              DropdownMenuItem(value: 0, child: Text(widget.isArabic ? 'مؤشر كتلة الجسم (BMI)' : 'BMI Calculator')),
+              DropdownMenuItem(value: 1, child: Text(widget.isArabic ? 'السعرات الحرارية (Calories)' : 'Calorie Calculator')),
+            ],
+            onChanged: (val) => setState(() => _selectedCalc = val!),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _selectedCalc == 0 ? _buildBmiView() : _buildCaloriesView(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBmiView() {
+    return ListView(
       children: [
-        // BMI Card
         Card(
           elevation: 2,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.isArabic ? 'حاسبة مؤشر كتلة الجسم (BMI)' : 'BMI Calculator',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.indigo)),
-                const SizedBox(height: 12),
                 TextField(controller: _weightController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'الوزن (كجم)' : 'Weight (kg)', border: const OutlineInputBorder())),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(controller: _heightController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'الطول (سم)' : 'Height (cm)', border: const OutlineInputBorder())),
-                const SizedBox(height: 12),
-                ElevatedButton(onPressed: _calculateBmi, child: Text(widget.isArabic ? 'حساب المؤشر' : 'Calculate BMI')),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _calculateBmi, child: Text(widget.isArabic ? 'حساب المؤشر' : 'Calculate BMI'))),
+                const SizedBox(height: 16),
                 if (_bmiValue > 0)
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(color: Colors.teal.shade50, borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    child: Column(
                       children: [
-                        Text('BMI: ${_bmiValue.toStringAsFixed(1)}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text(_bmiStatus, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
+                        Text('BMI: ${_bmiValue.toStringAsFixed(1)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.teal)),
+                        const SizedBox(height: 4),
+                        Text(_bmiStatus, style: const TextStyle(fontWeight: FontWeight.w500)),
                       ],
                     ),
                   )
@@ -354,37 +407,38 @@ class _HealthModuleState extends State<HealthModule> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        // Calorie Card
+      ],
+    );
+  }
+
+  Widget _buildCaloriesView() {
+    return ListView(
+      children: [
         Card(
           elevation: 2,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.isArabic ? 'حاسبة السعرات الحرارية اليومية' : 'Daily Calories Calculator',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.indigo)),
-                const SizedBox(height: 12),
                 TextField(controller: _calWeight, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'الوزن (كجم)' : 'Weight (kg)', border: const OutlineInputBorder())),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(controller: _calHeight, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'الطول (سم)' : 'Height (cm)', border: const OutlineInputBorder())),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(controller: _calAge, keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: widget.isArabic ? 'العمر (بالسنوات)' : 'Age (years)', border: const OutlineInputBorder())),
-                const SizedBox(height: 12),
-                ElevatedButton(onPressed: _calculateCalories, child: Text(widget.isArabic ? 'حساب السعرات' : 'Calculate Calories')),
-                const SizedBox(height: 12),
+                    decoration: InputDecoration(labelText: widget.isArabic ? 'العمر (سنوات)' : 'Age (years)', border: const OutlineInputBorder())),
+                const SizedBox(height: 16),
+                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _calculateCalories, child: Text(widget.isArabic ? 'حساب السعرات' : 'Calculate Calories'))),
+                const SizedBox(height: 16),
                 if (_dailyCalories > 0)
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(8)),
                     child: Center(
                       child: Text(
                         '${widget.isArabic ? "احتياجك اليومي:" : "Daily Need:"} ${_dailyCalories.toStringAsFixed(0)} ${widget.isArabic ? "سعرة حرارية" : "Calories"}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 16),
                       ),
                     ),
                   )
@@ -398,7 +452,7 @@ class _HealthModuleState extends State<HealthModule> {
 }
 
 // ==========================================
-// 3. UTILITIES MODULE (Discount, Date, Storage)
+// 3. UTILITIES MODULE (Dropdown Selector)
 // ==========================================
 class UtilitiesModule extends StatefulWidget {
   final bool isArabic;
@@ -409,12 +463,14 @@ class UtilitiesModule extends StatefulWidget {
 }
 
 class _UtilitiesModuleState extends State<UtilitiesModule> {
-  // Discount Controllers
+  int _selectedCalc = 0; // 0: Discount, 1: Storage
+
+  // Discount
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _discController = TextEditingController();
   double _finalPrice = 0.0, _savedAmount = 0.0;
 
-  // Storage Converter Controllers
+  // Storage
   final TextEditingController _gbController = TextEditingController();
   double _mbResult = 0.0, _kbResult = 0.0;
 
@@ -437,36 +493,58 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Padding(
       padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          DropdownButtonFormField<int>(
+            value: _selectedCalc,
+            decoration: InputDecoration(
+              labelText: widget.isArabic ? 'اختر الحاسبة اليومية' : 'Select Utility Calculator',
+              border: const OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            items: [
+              DropdownMenuItem(value: 0, child: Text(widget.isArabic ? 'حاسبة الخصم والنسبة (Discount)' : 'Discount Calculator')),
+              DropdownMenuItem(value: 1, child: Text(widget.isArabic ? 'تحويل سعات التخزين (Storage)' : 'Storage Converter')),
+            ],
+            onChanged: (val) => setState(() => _selectedCalc = val!),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _selectedCalc == 0 ? _buildDiscountView() : _buildStorageView(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDiscountView() {
+    return ListView(
       children: [
-        // Discount Card
         Card(
           elevation: 2,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.isArabic ? 'حاسبة الخصم والنسبة المئوية' : 'Discount & Percentage',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.indigo)),
-                const SizedBox(height: 12),
                 TextField(controller: _priceController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'السعر الأصلي' : 'Original Price', border: const OutlineInputBorder())),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(controller: _discController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'نسبة الخصم (%)' : 'Discount (%)', border: const OutlineInputBorder())),
-                const SizedBox(height: 12),
-                ElevatedButton(onPressed: _calculateDiscount, child: Text(widget.isArabic ? 'حساب الخصم' : 'Calculate')),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _calculateDiscount, child: Text(widget.isArabic ? 'حساب الخصم' : 'Calculate Discount'))),
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  child: Column(
                     children: [
-                      Text('${widget.isArabic ? "التوفير:" : "Save:"} ${_savedAmount.toStringAsFixed(2)}'),
-                      Text('${widget.isArabic ? "النهائي:" : "Final:"} ${_finalPrice.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                      Text('${widget.isArabic ? "مقدرا التوفير:" : "You Save:"} ${_savedAmount.toStringAsFixed(2)}'),
+                      const Divider(),
+                      Text('${widget.isArabic ? "السعر النهائي:" : "Final Price:"} ${_finalPrice.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
                     ],
                   ),
                 )
@@ -474,30 +552,32 @@ class _UtilitiesModuleState extends State<UtilitiesModule> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        // Storage Converter Card
+      ],
+    );
+  }
+
+  Widget _buildStorageView() {
+    return ListView(
+      children: [
         Card(
           elevation: 2,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.isArabic ? 'حاسبة وتحويل سعات التخزين' : 'Storage Size Converter',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.indigo)),
-                const SizedBox(height: 12),
                 TextField(controller: _gbController, keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: widget.isArabic ? 'المساحة بـ (جيجابايت GB)' : 'Size in (GB)', border: const OutlineInputBorder())),
-                const SizedBox(height: 12),
-                ElevatedButton(onPressed: _convertStorage, child: Text(widget.isArabic ? 'تحويل المساحة' : 'Convert Storage')),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _convertStorage, child: Text(widget.isArabic ? 'تحويل المساحة' : 'Convert Storage'))),
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(color: Colors.purple.shade50, borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     children: [
                       Text('MB: ${_mbResult.toStringAsFixed(0)}'),
-                      Text('KB: ${_kbResult.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const Divider(),
+                      Text('KB: ${_kbResult.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
                     ],
                   ),
                 )
