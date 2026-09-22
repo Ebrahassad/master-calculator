@@ -32,10 +32,10 @@ class _ScientificCalculatorScreenState extends State<ScientificCalculatorScreen>
   void _calculateResult() {
     try {
       String finalExpression = _expression
-          .replaceAll('×', '*\)
-          .replaceAll('÷', '/')
-          .replaceAll('π', '3.141592653589793')
-          .replaceAll('e', '2.718281828459045');
+          .replaceAll("×", "*")
+          .replaceAll("÷", "/")
+          .replaceAll("π", "3.141592653589793")
+          .replaceAll("e", "2.718281828459045");
 
       Parser p = Parser();
       Expression exp = p.parse(finalExpression);
