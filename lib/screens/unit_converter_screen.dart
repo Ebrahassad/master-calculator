@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class UnitConverterScreen extends StatefulWidget {
-  const UnitConverterScreen({Key? key}) : super(key: key);
+  final VoidCallback onOpenDrawer;
+  final Color backgroundColor;
+
+  const UnitConverterScreen({Key? key, required this.onOpenDrawer, required this.backgroundColor}) : super(key: key);
 
   @override
   _UnitConverterScreenState createState() => _UnitConverterScreenState();
@@ -60,27 +63,32 @@ class _UnitConverterScreenState extends State<UnitConverterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
 
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Colors.blueAccent, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blueAccent.withOpacity(0.4),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+      leading: Builder(
+        builder: (context) => IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.blueAccent, Colors.purpleAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blueAccent.withOpacity(0.4),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Icon(Icons.functions, color: Colors.white, size: 20),
           ),
-          child: const Icon(Icons.functions, color: Colors.white, size: 20),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+          tooltip: 'فتح القائمة الجانبية',
         ),
       ),
 
