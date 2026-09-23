@@ -177,8 +177,8 @@ class _MainContainerScreenState extends State<MainContainerScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
+            const DrawerHeader(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.blueAccent, Colors.purpleAccent],
                   begin: Alignment.topLeft,
@@ -188,9 +188,9 @@ class _MainContainerScreenState extends State<MainContainerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: const [
-                  const Icon(Icons.functions, color: Colors.white, size: 40),
-                  const SizedBox(height: 10),
+                children: [
+                  Icon(Icons.functions, color: Colors.white, size: 40),
+                  SizedBox(height: 10),
                   Text(
                     'موسوعة الحاسبات',
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
