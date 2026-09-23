@@ -1,109 +1,56 @@
 import 'package:flutter/material.dart';
 
-class AboutAppScreen extends StatelessWidget {
-  const AboutAppScreen({Key? key}) : super(key: key);
+class AboutScreen extends StatelessWidget {
+  const AboutScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final bool isArabic = Localizations.localeOf(context).languageCode == 'arabic' ||
-        Localizations.localeOf(context).languageCode == 'ar';
-
     return Scaffold(
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        title: Text(isArabic ? 'حول التطبيق' : 'About App'),
+        backgroundColor: const Color(0xFF1E1E1E),
+        elevation: 0,
+        title: const Text('حول التطبيق', style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 20),
+            const CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.blueAccent,
+              child: Icon(Icons.info_outline, size: 50, color: Colors.white),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'محول الوحدات الشامل & الحاسبة المتقدمة',
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'الإصدار 1.0.0',
+              style: TextStyle(color: Colors.white60, fontSize: 14),
+            ),
+            const SizedBox(height: 30),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.info_outline_rounded,
-                size: 48,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              isArabic ? 'الإصدار 1.0.0' : 'Version 1.0.0',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
+                color: const Color(0xFF1E1E1E),
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white24),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isArabic ? 'أبرز التحديثات والمميزات' : 'What\'s New & Features',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      isArabic
-                          ? '• تصميم واجهات مستخدم جديد ومتناسق كلياً لتجربة سلسة.
-'
-                            '• تحديث شامل لقائمة العملات العالمية والعربية (مع إضافة الدينار الليبي LYD).
-'
-                            '• تحسين الأداء العام وسرعة الاستجابة وتقليل استهلاك الموارد.
-'
-                            '• إصلاح الأخطاء البرمجية وتعزيز استقرار التطبيق.'
-                          : '• Completely redesigned, modern and consistent UI.\n'
-                            '• Expanded global and Arab currencies list (including Libyan Dinar LYD).\n'
-                            '• Performance optimizations and improved response time.\n'
-                            '• Bug fixes and enhanced overall stability.',
-                      style: const TextStyle(fontSize: 14, height: 1.6),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isArabic ? 'تواصل معنا' : 'Contact Us',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Icon(Icons.email_outlined, size: 20),
-                        const SizedBox(width: 8),
-                        SelectableText(
-                          'ebrahassadi77@gmail.com',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              child: const Column(
+                children: [
+                  Text(
+                    'تم تطوير هذا التطبيق بواسطة HASSADI لتوفير تجربة مستخدم سلسة واحترافية في إجراء كافة التحويلات والحسابات اليومية بدقة عالية.',
+                    style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
           ],

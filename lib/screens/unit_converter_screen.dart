@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class UnitConverterScreen extends StatefulWidget {
   const UnitConverterScreen({Key? key}) : super(key: key);
@@ -7,361 +9,398 @@ class UnitConverterScreen extends StatefulWidget {
   _UnitConverterScreenState createState() => _UnitConverterScreenState();
 }
 
-class _UnitConverterScreenState extends State<UnitConverterScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _UnitConverterScreenState extends State<UnitConverterScreen> {
+  String _selectedCategory = 'التحويلات المالية';
+
+  final List<String> _categories = [
+    'التحويلات المالية',
+    'القياسات والأطوال',
+    'درجات الحرارة',
+    'التخزين الرقمي',
+    'الوزن والكتلة',
+    'السرعة',
+    'الزمن',
+  ];
+
+  double _amount = 1.0;
+  String _fromCurrency = 'دولار أمريكي (USD)';
+  String _toCurrency = 'دينار ليبي (LYD)';
+  double _result = 0.0;
+  bool _isLoading = false;
+  String _statusMessage = '';
+
+  final Map<String, String> _currencyCodes = {
+    'دولار أمريكي (USD)': 'USD',
+    'دينار ليبي (LYD)': 'LYD',
+    'ريال سعودي (SAR)': 'SAR',
+    'يورو (EUR)': 'EUR',
+    'جنيه إسترليني (GBP)': 'GBP',
+    'درهم إماراتي (AED)': 'AED',
+    'جنيه مصري (EGP)': 'EGP',
+    'دينار كويتي (KWD)': 'KWD',
+    'ريال قطري (QAR)': 'QAR',
+    'دينار بحريني (BHD)': 'BHD',
+    'ريال عماني (OMR)': 'OMR',
+    'دينار أردني (JOD)': 'JOD',
+    'دولار كندي (CAD)': 'CAD',
+    'دولار أسترالي (AUD)': 'AUD',
+    'ين ياباني (JPY)': 'JPY',
+    'فرنك سويسري (CHF)': 'CHF',
+    'يوان صيني (CNY)': 'CNY',
+    'روبية هندية (INR)': 'INR',
+    'ليرة تركية (TRY)': 'TRY',
+    'درهم مغربي (MAD)': 'MAD',
+    'دينار تونسي (TND)': 'TND',
+    'دينار جزائري (DZD)': 'DZD',
+    'دينار عراقي (IQD)': 'IQD',
+  };
+
+  final Map<String, double> _rates = {
+    'USD': 1.0,
+    'LYD': 4.85,
+    'SAR': 3.75,
+    'EUR': 0.91,
+    'GBP': 0.76,
+    'AED': 3.67,
+    'EGP': 49.0,
+    'KWD': 0.31,
+    'QAR': 3.64,
+    'BHD': 0.376,
+    'OMR': 0.385,
+    'JOD': 0.709,
+    'CAD': 1.35,
+    'AUD': 1.50,
+    'JPY': 148.0,
+    'CHF': 0.86,
+    'CNY': 7.15,
+    'INR': 83.5,
+    'TRY': 34.0,
+    'MAD': 9.95,
+    'TND': 3.12,
+    'DZD': 134.5,
+    'IQD': 1310.0,
+  };
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _fetchLiveRates();
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  Future<void> _fetchLiveRates() async {
+    setState(() {
+      _isLoading = true;
+      _statusMessage = 'جاري تحديث أسعار الصرف الحية...';
+    });
+
+    try {
+      final response = await http.get(Uri.parse('https://open.er-api.com/v6/latest/USD')).timeout(const Duration(seconds: 6));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['result'] == 'success') {
+          final ratesMap = data['rates'] as Map<String, dynamic>;
+          setState(() {
+            ratesMap.forEach((key, value) {
+              if (_rates.containsKey(key)) {
+                _rates[key] = (value as num).toDouble();
+              }
+            });
+            _statusMessage = 'تم تحديث الأسعار الحية ✓';
+            _isLoading = false;
+          });
+          _convertCurrency();
+          return;
+        }
+      }
+    } catch (e) {
+      // Fallback
+    }
+
+    setState(() {
+      _statusMessage = 'وضع عدم الاتصال (الأسعار المحفوظة)';
+      _isLoading = false;
+    });
+    _convertCurrency();
+  }
+
+  void _convertCurrency() {
+    setState(() {
+      String fromCode = _currencyCodes[_fromCurrency] ?? 'USD';
+      String toCode = _currencyCodes[_toCurrency] ?? 'LYD';
+      
+      double fromRate = _rates[fromCode] ?? 1.0;
+      double toRate = _rates[toCode] ?? 1.0;
+
+      double usdAmount = _amount / fromRate;
+      _result = usdAmount * toRate;
+    });
+  }
+
+  void _swapCurrencies() {
+    setState(() {
+      String temp = _fromCurrency;
+      _fromCurrency = _toCurrency;
+      _toCurrency = temp;
+      _convertCurrency();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final List<String> currencyKeys = _currencyCodes.keys.toList();
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        title: const Text("محول الوحدات الشامل", style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF1E293B),
-        iconTheme: const IconThemeData(color: Colors.white),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.tealAccent,
-          labelColor: Colors.tealAccent,
-          unselectedLabelColor: Colors.white60,
-          isScrollable: true,
-          tabs: const [
-            Tab(text: "القياسات والأطوال"),
-            Tab(text: "درجات الحرارة"),
-            Tab(text: "التخزين الرقمي"),
-            Tab(text: "التحويلات المالية"),
-          ],
+        backgroundColor: const Color(0xFF1E1E1E),
+        elevation: 0,
+        title: const Text('محول الوحدات الشامل', style: TextStyle(color: Colors.white, fontSize: 18)),
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(65.0),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            color: const Color(0xFF181818),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.category_outlined, color: Colors.blueAccent, size: 20),
+                const SizedBox(width: 8),
+                const Text(
+                  'نوع التحويل: ',
+                  style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2C2C2C),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.blueAccent.withOpacity(0.4)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedCategory,
+                        dropdownColor: const Color(0xFF1E1E1E),
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent),
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                        isExpanded: true,
+                        items: _categories.map((String category) {
+                          return DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category, overflow: TextOverflow.ellipsis),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _selectedCategory = newValue;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          MeasurementConverterTab(),
-          TemperatureConverterTab(),
-          StorageConverterTab(),
-          FinancialConverterTab(),
-        ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF181818), Color(0xFF121212)],
+          ),
+        ),
+        child: _buildSelectedBody(currencyKeys),
       ),
     );
   }
-}
 
-class MeasurementConverterTab extends StatefulWidget {
-  const MeasurementConverterTab({Key? key}) : super(key: key);
-  @override
-  _MeasurementConverterTabState createState() => _MeasurementConverterTabState();
-}
-
-class _MeasurementConverterTabState extends State<MeasurementConverterTab> {
-  double _inputVal = 0.0;
-  String _fromUnit = "متر";
-  String _toUnit = "كيلومتر";
-  double _outputVal = 0.0;
-
-  final Map<String, double> _units = {
-    "متر": 1.0,
-    "كيلومتر": 1000.0,
-    "سنتيمتر": 0.01,
-    "ميل": 1609.34,
-    "قدم": 0.3048,
-  };
-
-  void _convert() {
-    setState(() {
-      double baseInMeters = _inputVal * (_units[_fromUnit] ?? 1.0);
-      _outputVal = baseInMeters / (_units[_toUnit] ?? 1.0);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: [
-          TextField(
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: "أدخل القيمة",
-              labelStyle: const TextStyle(color: Colors.white70),
-              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white30), borderRadius: BorderRadius.circular(12)),
-              focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.tealAccent), borderRadius: BorderRadius.circular(12)),
-            ),
-            onChanged: (val) {
-              setState(() {
-                _inputVal = double.tryParse(val) ?? 0.0;
-                _convert();
-              });
-            },
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              DropdownButton<String>(
-                value: _fromUnit,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: _units.keys.map((String val) => DropdownMenuItem<String>(value: val, child: Text(val))).toList(),
-                onChanged: (val) { setState(() { _fromUnit = val!; _convert(); }); },
+  Widget _buildSelectedBody(List<String> currencyKeys) {
+    if (_selectedCategory == 'التحويلات المالية') {
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            if (_isLoading || _statusMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_isLoading) ...[
+                      const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      _statusMessage,
+                      style: TextStyle(fontSize: 13, color: _isLoading ? Colors.blueAccent : Colors.greenAccent),
+                    ),
+                  ],
+                ),
               ),
-              const Icon(Icons.arrow_forward, color: Colors.tealAccent),
-              DropdownButton<String>(
-                value: _toUnit,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: _units.keys.map((String val) => DropdownMenuItem<String>(value: val, child: Text(val))).toList(),
-                onChanged: (val) { setState(() { _toUnit = val!; _convert(); }); },
+            TextField(
+              controller: TextEditingController(text: _amount == 0.0 ? '' : _amount.toString())
+                ..selection = TextSelection.fromPosition(TextPosition(offset: (_amount == 0.0 ? '' : _amount.toString()).length)),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                labelText: 'المبلغ المالي',
+                labelStyle: const TextStyle(color: Colors.white70),
+                prefixIcon: const Icon(Icons.attach_money, color: Colors.blueAccent),
+                filled: true,
+                fillColor: const Color(0xFF1E1E1E),
+                enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(16)),
+                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.blueAccent, width: 2), borderRadius: BorderRadius.circular(16)),
+              ),
+              onChanged: (val) {
+                setState(() {
+                  _amount = double.tryParse(val) ?? 0.0;
+                  _convertCurrency();
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<String>(
+              value: _fromCurrency,
+              dropdownColor: const Color(0xFF1E1E1E),
+              style: const TextStyle(color: Colors.white, fontSize: 15),
+              decoration: InputDecoration(
+                labelText: 'من عملة الأساس',
+                labelStyle: const TextStyle(color: Colors.white70),
+                prefixIcon: const Icon(Icons.arrow_upward, color: Colors.greenAccent),
+                filled: true,
+                fillColor: const Color(0xFF1E1E1E),
+                enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(16)),
+                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.blueAccent, width: 2), borderRadius: BorderRadius.circular(16)),
+              ),
+              items: currencyKeys.map((String currency) {
+                return DropdownMenuItem<String>(
+                  value: currency,
+                  child: Text(currency),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _fromCurrency = newValue;
+                    _convertCurrency();
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 12),
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E1E),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white24),
+                ),
+                child: IconButton(
+                  onPressed: _swapCurrencies,
+                  icon: const Icon(Icons.swap_vert, size: 28, color: Colors.blueAccent),
+                  tooltip: 'تبديل العملات',
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _toCurrency,
+              dropdownColor: const Color(0xFF1E1E1E),
+              style: const TextStyle(color: Colors.white, fontSize: 15),
+              decoration: InputDecoration(
+                labelText: 'إلى العملة المستهدفة',
+                labelStyle: const TextStyle(color: Colors.white70),
+                prefixIcon: const Icon(Icons.arrow_downward, color: Colors.orangeAccent),
+                filled: true,
+                fillColor: const Color(0xFF1E1E1E),
+                enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(16)),
+                focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.blueAccent, width: 2), borderRadius: BorderRadius.circular(16)),
+              ),
+              items: currencyKeys.map((String currency) {
+                return DropdownMenuItem<String>(
+                  value: currency,
+                  child: Text(currency),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _toCurrency = newValue;
+                    _convertCurrency();
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 28),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blueAccent.withOpacity(0.25), Colors.blueAccent.withOpacity(0.1)],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.blueAccent.withOpacity(0.4)),
+              ),
+              child: Column(
+                children: [
+                  const Text('المبلغ المحول بدقة', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const SizedBox(height: 10),
+                  Text(
+                    '${_result.toStringAsFixed(2)} $_toCurrency',
+                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _fetchLiveRates,
+              icon: const Icon(Icons.refresh),
+              label: const Text('تحديث الأسعار المباشرة'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.construction_rounded, size: 64, color: Colors.blueAccent),
+              const SizedBox(height: 16),
+              Text(
+                'قسم "$_selectedCategory" قيد التحديث',
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'سيتم إضافة حاسبة هذا القسم قريباً بتصميم احترافي.',
+                style: TextStyle(color: Colors.white60, fontSize: 14),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
-          const SizedBox(height: 30),
-          Text("النتيجة: $_outputVal $_toUnit", style: const TextStyle(fontSize: 22, color: Colors.tealAccent, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-}
-
-class TemperatureConverterTab extends StatefulWidget {
-  const TemperatureConverterTab({Key? key}) : super(key: key);
-  @override
-  _TemperatureConverterTabState createState() => _TemperatureConverterTabState();
-}
-
-class _TemperatureConverterTabState extends State<TemperatureConverterTab> {
-  double _inputVal = 0.0;
-  String _fromUnit = "سيلسيوس (°C)";
-  String _toUnit = "فهرنهايت (°F)";
-  double _outputVal = 0.0;
-
-  void _convert() {
-    setState(() {
-      double celsius = _inputVal;
-      if (_fromUnit == "فهرنهايت (°F)") celsius = (_inputVal - 32) * 5 / 9;
-      else if (_fromUnit == "كلفن (K)") celsius = _inputVal - 273.15;
-
-      if (_toUnit == "سيلسيوس (°C)") _outputVal = celsius;
-      else if (_toUnit == "فهرنهايت (°F)") _outputVal = (celsius * 9 / 5) + 32;
-      else if (_toUnit == "كلفن (K)") _outputVal = celsius + 273.15;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    List<String> units = ["سيلسيوس (°C)", "فهرنهايت (°F)", "كلفن (K)"];
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: [
-          TextField(
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: "درجة الحرارة",
-              labelStyle: const TextStyle(color: Colors.white70),
-              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white30), borderRadius: BorderRadius.circular(12)),
-            ),
-            onChanged: (val) { setState(() { _inputVal = double.tryParse(val) ?? 0.0; _convert(); }); },
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              DropdownButton<String>(
-                value: _fromUnit,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: units.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                onChanged: (val) { setState(() { _fromUnit = val!; _convert(); }); },
-              ),
-              const Icon(Icons.arrow_forward, color: Colors.tealAccent),
-              DropdownButton<String>(
-                value: _toUnit,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: units.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                onChanged: (val) { setState(() { _toUnit = val!; _convert(); }); },
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
-          Text("النتيجة: ${_outputVal.toStringAsFixed(2)} $_toUnit", style: const TextStyle(fontSize: 22, color: Colors.tealAccent, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-}
-
-class StorageConverterTab extends StatefulWidget {
-  const StorageConverterTab({Key? key}) : super(key: key);
-  @override
-  _StorageConverterTabState createState() => _StorageConverterTabState();
-}
-
-class _StorageConverterTabState extends State<StorageConverterTab> {
-  double _inputVal = 0.0;
-  String _fromUnit = "ميغابايت (MB)";
-  String _toUnit = "جيجابايت (GB)";
-  double _outputVal = 0.0;
-
-  final Map<String, double> _units = {
-    "كيلوبايت (KB)": 1024,
-    "ميغابايت (MB)": 1024 * 1024,
-    "جيجابايت (GB)": 1024 * 1024 * 1024,
-    "تيرابايت (TB)": 1024.0 * 1024 * 1024 * 1024,
-  };
-
-  void _convert() {
-    setState(() {
-      double bytes = _inputVal * (_units[_fromUnit] ?? 1.0);
-      _outputVal = bytes / (_units[_toUnit] ?? 1.0);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: [
-          TextField(
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: "حجم التخزين",
-              labelStyle: const TextStyle(color: Colors.white70),
-              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white30), borderRadius: BorderRadius.circular(12)),
-            ),
-            onChanged: (val) { setState(() { _inputVal = double.tryParse(val) ?? 0.0; _convert(); }); },
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              DropdownButton<String>(
-                value: _fromUnit,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: _units.keys.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                onChanged: (val) { setState(() { _fromUnit = val!; _convert(); }); },
-              ),
-              const Icon(Icons.arrow_forward, color: Colors.tealAccent),
-              DropdownButton<String>(
-                value: _toUnit,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: _units.keys.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                onChanged: (val) { setState(() { _toUnit = val!; _convert(); }); },
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
-          Text("النتيجة: ${_outputVal.toStringAsFixed(4)} $_toUnit", style: const TextStyle(fontSize: 22, color: Colors.tealAccent, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-}
-
-class FinancialConverterTab extends StatefulWidget {
-  const FinancialConverterTab({Key? key}) : super(key: key);
-  @override
-  _FinancialConverterTabState createState() => _FinancialConverterTabState();
-}
-
-class _FinancialConverterTabState extends State<FinancialConverterTab> {
-  double _amount = 0.0;
-  String _fromCurrency = "دولار أمريكي (USD)";
-  String _toCurrency = "ريال سعودي (SAR)";
-  double _result = 0.0;
-
-  final Map<String, double> _rates = {
-    "دولار أمريكي (USD)": 1.0,
-    "يورو (EUR)": 0.91,
-    "جنيه إسترليني (GBP)": 0.76,
-    "ريال سعودي (SAR)": 3.75,
-    "درهم إماراتي (AED)": 3.67,
-    "جنيه مصري (EGP)": 49.0,
-    "دينار ليبي (LYD)": 4.85,
-    "دينار كويتي (KWD)": 0.31,
-    "ريال قطري (QAR)": 3.64,
-    "دينار بحريني (BHD)": 0.376,
-    "ريال عماني (OMR)": 0.385,
-    "دينار أردني (JOD)": 0.709,
-    "دولار كندي (CAD)": 1.35,
-    "دولار أسترالي (AUD)": 1.50,
-    "ين ياباني (JPY)": 148.0,
-    "فرنك سويسري (CHF)": 0.86,
-    "يوان صيني (CNY)": 7.15,
-    "روبية هندية (INR)": 83.5,
-    "ليرة تركية (TRY)": 34.0,
-    "درهم مغربي (MAD)": 9.95,
-    "دينار تونسي (TND)": 3.12,
-    "دينار جزائري (DZD)": 134.5,
-    "دينار عراقي (IQD)": 1310.0,
-  };
-
-  void _convert() {
-    setState(() {
-      double usdAmount = _amount / (_rates[_fromCurrency] ?? 1.0);
-      _result = usdAmount * (_rates[_toCurrency] ?? 1.0);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: [
-          TextField(
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: "المبلغ المالي",
-              labelStyle: const TextStyle(color: Colors.white70),
-              enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white30), borderRadius: BorderRadius.circular(12)),
-            ),
-            onChanged: (val) { setState(() { _amount = double.tryParse(val) ?? 0.0; _convert(); }); },
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              DropdownButton<String>(
-                value: _fromCurrency,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: _rates.keys.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                onChanged: (val) { setState(() { _fromCurrency = val!; _convert(); }); },
-              ),
-              const Icon(Icons.arrow_forward, color: Colors.tealAccent),
-              DropdownButton<String>(
-                value: _toCurrency,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white),
-                items: _rates.keys.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                onChanged: (val) { setState(() { _toCurrency = val!; _convert(); }); },
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
-          Text("المبلغ المحول: ${_result.toStringAsFixed(2)} $_toCurrency", style: const TextStyle(fontSize: 22, color: Colors.tealAccent, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
+        ),
+      );
+    }
   }
 }
