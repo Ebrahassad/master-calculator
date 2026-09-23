@@ -25,7 +25,32 @@ class _DailyCalculatorScreenState extends State<DailyCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('الحاسبات اليومية (الخصم)', style: TextStyle(fontSize: 18))),
+      appBar: AppBar(
+
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Colors.blueAccent, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blueAccent.withOpacity(0.4),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.functions, color: Colors.white, size: 20),
+        ),
+      ),
+
+        title: const Text('الحاسبات اليومية (الخصم)', style: TextStyle(fontSize: 18)),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -95,11 +120,11 @@ class _DailyCalculatorScreenState extends State<DailyCalculatorScreen> {
                 children: [
                   const Text('مقدار التوفير', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 6),
-                  Text('${_savings.toStringAsFixed(2)}', style: const TextStyle(color: Colors.greenAccent, fontSize: 22, fontWeight: FontWeight.bold)),
+                  Text(_savings.toStringAsFixed(2), style: const TextStyle(color: Colors.greenAccent, fontSize: 22, fontWeight: FontWeight.bold)),
                   const Divider(color: Colors.white24, height: 24),
                   const Text('السعر النهائي', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 6),
-                  Text('${_finalPrice.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                  Text(_finalPrice.toStringAsFixed(2), style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

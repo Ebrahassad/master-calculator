@@ -25,7 +25,32 @@ class _BusinessCalculatorScreenState extends State<BusinessCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('حاسبة المال والأعمال (VAT)', style: TextStyle(fontSize: 18))),
+      appBar: AppBar(
+
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Colors.blueAccent, Colors.purpleAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blueAccent.withOpacity(0.4),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.functions, color: Colors.white, size: 20),
+        ),
+      ),
+
+        title: const Text('حاسبة المال والأعمال (VAT)', style: TextStyle(fontSize: 18)),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -95,11 +120,11 @@ class _BusinessCalculatorScreenState extends State<BusinessCalculatorScreen> {
                 children: [
                   const Text('قيمة الضريبة', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 6),
-                  Text('${_vatAmount.toStringAsFixed(2)}', style: const TextStyle(color: Colors.orangeAccent, fontSize: 22, fontWeight: FontWeight.bold)),
+                  Text(_vatAmount.toStringAsFixed(2), style: const TextStyle(color: Colors.orangeAccent, fontSize: 22, fontWeight: FontWeight.bold)),
                   const Divider(color: Colors.white24, height: 24),
                   const Text('الإجمالي الشامل', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 6),
-                  Text('${_totalAmount.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                  Text(_totalAmount.toStringAsFixed(2), style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
