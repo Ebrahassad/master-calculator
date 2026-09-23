@@ -1,3 +1,4 @@
+import 'screens/analytics_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/unit_converter_screen.dart';
 import 'screens/daily_calculator_screen.dart';
@@ -106,7 +107,8 @@ class _MainContainerScreenState extends State<MainContainerScreen> {
                           blurRadius: 12,
                           spreadRadius: 2,
                         ),
-                      ],
+                      
+],
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -177,6 +179,23 @@ class _MainContainerScreenState extends State<MainContainerScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
+            ListTile(
+              leading: const Icon(Icons.bar_chart_rounded, color: Colors.tealAccent),
+              title: const Text('التحليلات والرسوم البيانية', style: TextStyle(color: Colors.white)),
+              subtitle: const Text('عرض مؤشرات الأداء والإحصائيات', style: TextStyle(color: Colors.white60, fontSize: 12)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AnalyticsScreen(
+                      onOpenDrawer: () => Scaffold.of(context).openDrawer(),
+                      backgroundColor: widget.backgroundColor,
+                    ),
+                  ),
+                );
+              },
+            ),
             const DrawerHeader(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
