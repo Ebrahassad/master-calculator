@@ -5,6 +5,9 @@ plugins {
 }
 
 android {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
     namespace = "com.hassadi.master_calculator"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
