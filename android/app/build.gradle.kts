@@ -51,3 +51,8 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
