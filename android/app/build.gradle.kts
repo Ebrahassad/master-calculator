@@ -56,3 +56,7 @@ tasks.withType<JavaCompile> {
     sourceCompatibility = "17"
     targetCompatibility = "17"
 }
+
+kotlin {
+    jvmToolchain(17)
+}
