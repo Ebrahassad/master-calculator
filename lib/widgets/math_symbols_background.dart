@@ -52,7 +52,7 @@ class MathSymbolsBackground extends StatelessWidget {
                     s.text,
                     style: TextStyle(
                       fontSize: s.size,
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withOpacity(0.14),
                       fontWeight: FontWeight.bold,
                     ),
                   ),

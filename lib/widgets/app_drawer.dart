@@ -8,13 +8,15 @@ import '../services/ads_service.dart';
 import '../services/sessions_repository.dart';
 import '../screens/history_screen.dart';
 import '../screens/about_screen.dart';
+import 'developer_link.dart';
 
 /// القائمة الجانبية المشتركة بين كل شاشات التطبيق
 class AppDrawer extends StatelessWidget {
   final Color backgroundColor;
   final ValueChanged<Color> onColorChanged;
 
-  const AppDrawer({super.key, required this.backgroundColor, required this.onColorChanged});
+  const AppDrawer(
+      {super.key, required this.backgroundColor, required this.onColorChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +37,23 @@ class AppDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Icon(Icons.calculate_rounded, color: Colors.white, size: 40),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/app_icon.png',
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 const SizedBox(height: 10),
-                Text(tr(context, 'app_title'), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                const Text('Master Calculator Hub', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                Text(tr(context, 'app_title'),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+                const Text('Master Calculator Hub',
+                    style: TextStyle(color: Colors.white70, fontSize: 13)),
               ],
             ),
           ),
@@ -59,7 +74,10 @@ class AppDrawer extends StatelessWidget {
             label: tr(context, 'drawer_history'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryScreen()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const HistoryScreen()));
             },
           ),
           _tile(
@@ -99,7 +117,8 @@ class AppDrawer extends StatelessWidget {
             label: tr(context, 'drawer_about'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const AboutScreen()));
             },
           ),
           const Divider(color: Colors.white24),
@@ -112,10 +131,19 @@ class AppDrawer extends StatelessWidget {
             onTap: () => SystemNavigator.pop(),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              '${tr(context, 'drawer_version')} $kAppVersion\n${tr(context, 'drawer_contact')}: $kContactEmail',
-              style: const TextStyle(color: Colors.white54, fontSize: 12),
+            padding: const EdgeInsets.fromLTRB(8, 10, 8, 16),
+            child: Column(
+              children: [
+                Text(
+                  '${tr(context, 'drawer_version')} $kAppVersion',
+                  style: const TextStyle(
+                    color: Colors.white54,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const DeveloperLink(),
+              ],
             ),
           ),
         ],
@@ -148,7 +176,8 @@ class AppDrawer extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF222222),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(tr(dialogContext, 'notes_title'), style: const TextStyle(color: Colors.white)),
+        title: Text(tr(dialogContext, 'notes_title'),
+            style: const TextStyle(color: Colors.white)),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -159,21 +188,26 @@ class AppDrawer extends StatelessWidget {
             hintStyle: const TextStyle(color: Colors.white38),
             filled: true,
             fillColor: const Color(0xFF1A1A1A),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(tr(dialogContext, 'cancel'), style: const TextStyle(color: Colors.white54)),
+            child: Text(tr(dialogContext, 'cancel'),
+                style: const TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.tealAccent[700]),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.tealAccent[700]),
             onPressed: () async {
               final text = controller.text.trim();
               if (text.isEmpty) {
                 ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  SnackBar(content: Text(tr(dialogContext, 'notes_empty_error'))),
+                  SnackBar(
+                      content: Text(tr(dialogContext, 'notes_empty_error'))),
                 );
                 return;
               }
@@ -185,7 +219,8 @@ class AppDrawer extends StatelessWidget {
                 );
               }
             },
-            child: Text(tr(dialogContext, 'save'), style: const TextStyle(color: Colors.black)),
+            child: Text(tr(dialogContext, 'save'),
+                style: const TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -193,7 +228,8 @@ class AppDrawer extends StatelessWidget {
   }
 
   // ================= نافذة اختيار لون الخلفية =================
-  void _showColorPicker(BuildContext context, ValueChanged<Color> onColorChanged) {
+  void _showColorPicker(
+      BuildContext context, ValueChanged<Color> onColorChanged) {
     const premiumColor = Color(0xFF3E2C0C);
     showDialog(
       context: context,
@@ -201,36 +237,47 @@ class AppDrawer extends StatelessWidget {
         builder: (dialogContext, setDialogState) {
           return AlertDialog(
             backgroundColor: const Color(0xFF222222),
-            title: Text(tr(dialogContext, 'pick_color'), style: const TextStyle(color: Colors.white)),
+            title: Text(tr(dialogContext, 'pick_color'),
+                style: const TextStyle(color: Colors.white)),
             content: Wrap(
               spacing: 12,
               runSpacing: 12,
               children: [
-                _colorButton(dialogContext, const Color(0xFF121212), tr(dialogContext, 'theme_dark_original'), onColorChanged),
-                _colorButton(dialogContext, const Color(0xFF0F172A), tr(dialogContext, 'theme_navy_dark'), onColorChanged),
-                _colorButton(dialogContext, const Color(0xFF1E1B4B), tr(dialogContext, 'theme_deep_night'), onColorChanged),
-                _colorButton(dialogContext, const Color(0xFF14281D), tr(dialogContext, 'theme_dark_green'), onColorChanged),
-                _colorButton(dialogContext, const Color(0xFF3B0764), tr(dialogContext, 'theme_royal_purple'), onColorChanged),
-                _colorButton(dialogContext, const Color(0xFF1A1A1A), tr(dialogContext, 'theme_graphite_gray'), onColorChanged),
+                _colorButton(dialogContext, const Color(0xFF121212),
+                    tr(dialogContext, 'theme_dark_original'), onColorChanged),
+                _colorButton(dialogContext, const Color(0xFF0F172A),
+                    tr(dialogContext, 'theme_navy_dark'), onColorChanged),
+                _colorButton(dialogContext, const Color(0xFF1E1B4B),
+                    tr(dialogContext, 'theme_deep_night'), onColorChanged),
+                _colorButton(dialogContext, const Color(0xFF14281D),
+                    tr(dialogContext, 'theme_dark_green'), onColorChanged),
+                _colorButton(dialogContext, const Color(0xFF3B0764),
+                    tr(dialogContext, 'theme_royal_purple'), onColorChanged),
+                _colorButton(dialogContext, const Color(0xFF1A1A1A),
+                    tr(dialogContext, 'theme_graphite_gray'), onColorChanged),
                 FutureBuilder<bool>(
                   future: _isPremiumUnlocked(),
                   builder: (context, snapshot) {
                     final unlocked = snapshot.data ?? false;
                     if (unlocked) {
-                      return _colorButton(dialogContext, premiumColor, tr(dialogContext, 'premium_theme'), onColorChanged);
+                      return _colorButton(dialogContext, premiumColor,
+                          tr(dialogContext, 'premium_theme'), onColorChanged);
                     }
                     return GestureDetector(
-                      onTap: () => _handlePremiumTap(dialogContext, setDialogState),
+                      onTap: () =>
+                          _handlePremiumTap(dialogContext, setDialogState),
                       child: Container(
                         width: 70,
                         height: 40,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [Color(0xFFB8860B), Color(0xFF4A3200)]),
+                          gradient: const LinearGradient(
+                              colors: [Color(0xFFB8860B), Color(0xFF4A3200)]),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.amberAccent),
                         ),
                         alignment: Alignment.center,
-                        child: const Icon(Icons.lock, color: Colors.white, size: 18),
+                        child: const Icon(Icons.lock,
+                            color: Colors.white, size: 18),
                       ),
                     );
                   },
@@ -248,7 +295,8 @@ class AppDrawer extends StatelessWidget {
     return prefs.getBool('premium_theme_unlocked') ?? false;
   }
 
-  void _handlePremiumTap(BuildContext dialogContext, void Function(void Function()) setDialogState) {
+  void _handlePremiumTap(BuildContext dialogContext,
+      void Function(void Function()) setDialogState) {
     AdsService.instance.showRewarded(
       onReward: () async {
         final prefs = await SharedPreferences.getInstance();
@@ -268,7 +316,8 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _colorButton(BuildContext context, Color color, String label, ValueChanged<Color> onColorChanged) {
+  Widget _colorButton(BuildContext context, Color color, String label,
+      ValueChanged<Color> onColorChanged) {
     return GestureDetector(
       onTap: () {
         onColorChanged(color);
@@ -277,9 +326,14 @@ class AppDrawer extends StatelessWidget {
       child: Container(
         width: 70,
         height: 40,
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white38)),
+        decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white38)),
         alignment: Alignment.center,
-        child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 10), textAlign: TextAlign.center),
+        child: Text(label,
+            style: const TextStyle(color: Colors.white, fontSize: 10),
+            textAlign: TextAlign.center),
       ),
     );
   }

@@ -130,7 +130,7 @@ class _ScientificCalculatorScreenState extends State<ScientificCalculatorScreen>
             _display1(),
             const Divider(height: 1, color: Colors.white24),
             _controlsRow(),
-            Expanded(flex: 11, child: _secondPage ? _pageTwo() : _pageOne()),
+            Expanded(flex: 10, child: _secondPage ? _pageTwo() : _pageOne()),
             const BannerAdBar(),
           ],
         ),
@@ -140,7 +140,7 @@ class _ScientificCalculatorScreenState extends State<ScientificCalculatorScreen>
 
   Widget _display1() {
     return Expanded(
-      flex: 2,
+      flex: 3,
       child: Container(
         width: double.infinity,
         alignment: Alignment.bottomRight,
@@ -188,7 +188,7 @@ class _ScientificCalculatorScreenState extends State<ScientificCalculatorScreen>
 
   Widget _btn(String text, {Color? color, VoidCallback? onTap}) {
     return Padding(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(2),
       child: SizedBox.expand(
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
