@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
 import '../services/expression_evaluator.dart';
+import '../widgets/banner_ad_bar.dart';
 
 class ScientificCalculatorScreen extends StatefulWidget {
   const ScientificCalculatorScreen({super.key});
@@ -123,13 +124,16 @@ class _ScientificCalculatorScreenState extends State<ScientificCalculatorScreen>
           IconButton(icon: const Icon(Icons.history), onPressed: _showHistory),
         ],
       ),
-      body: Column(
-        children: [
-          _display1(),
-          const Divider(height: 1, color: Colors.white24),
-          _controlsRow(),
-          Expanded(flex: 3, child: _secondPage ? _pageTwo() : _pageOne()),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            _display1(),
+            const Divider(height: 1, color: Colors.white24),
+            _controlsRow(),
+            Expanded(flex: 11, child: _secondPage ? _pageTwo() : _pageOne()),
+            const BannerAdBar(),
+          ],
+        ),
       ),
     );
   }
@@ -185,24 +189,32 @@ class _ScientificCalculatorScreenState extends State<ScientificCalculatorScreen>
   Widget _btn(String text, {Color? color, VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.all(4),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color ?? const Color(0xFF262626),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: EdgeInsets.zero,
+      child: SizedBox.expand(
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color ?? const Color(0xFF262626),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            padding: EdgeInsets.zero,
+          ),
+          onPressed: onTap ?? () => _input(text),
+          child: FittedBox(child: Text(text, style: const TextStyle(fontSize: 17, color: Colors.white))),
         ),
-        onPressed: onTap ?? () => _input(text),
-        child: Text(text, style: const TextStyle(fontSize: 17, color: Colors.white)),
       ),
     );
   }
 
+  /// شبكة أزرار تعتمد على Column/Row بنسب مرنة (Expanded) بدل GridView
+  /// لضمان عدم حدوث أي تمرير أو تجاوز في الارتفاع على أي جهاز مهما كان صغيرًا
   Widget _grid(List<Widget> children) {
-    return GridView.count(
-      crossAxisCount: 4,
-      padding: const EdgeInsets.all(6),
-      childAspectRatio: 1.3,
-      children: children,
+    const cols = 4;
+    final rows = <Widget>[];
+    for (int i = 0; i < children.length; i += cols) {
+      final rowChildren = children.skip(i).take(cols).map((w) => Expanded(child: w)).toList();
+      rows.add(Expanded(child: Row(children: rowChildren)));
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(children: rows),
     );
   }
 

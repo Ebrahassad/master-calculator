@@ -78,6 +78,17 @@ class AdsService {
 
   bool get isRewardedReady => _rewardedReady;
 
+  int _navCount = 0;
+
+  /// يُستدعى عند كل انتقال لشاشة حاسبة من القائمة الرئيسية؛
+  /// يعرض إعلانًا بينيًا كل 4 انتقالات فقط حتى لا يكون مزعجًا
+  void trackNavigationAndMaybeShowAd() {
+    _navCount++;
+    if (_navCount % 4 == 0) {
+      showInterstitial();
+    }
+  }
+
   /// يعرض إعلان مكافأة، ويستدعي onReward فقط إذا أكمل المستخدم المشاهدة كاملة
   void showRewarded({required VoidCallback onReward, VoidCallback? onNotReady}) {
     if (!_initialized || !_rewardedReady) {

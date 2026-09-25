@@ -59,7 +59,7 @@ class _CalculationsTabState extends State<CalculationsTab> {
       case 'c_percentage':
         final result = v1 * (v2 / 100);
         r = [
-          ResultLine('$v2% من $v1', result.toStringAsFixed(2), color: Colors.tealAccent, big: true),
+          ResultLine('$v2% ${tr(context, 'c_percentage_of')} $v1', result.toStringAsFixed(2), color: Colors.tealAccent, big: true),
         ];
         break;
       case 'c_tip':
@@ -88,16 +88,21 @@ class _CalculationsTabState extends State<CalculationsTab> {
         }
         final totalDays = now.difference(_dateA).inDays;
         r = [
-          ResultLine(tr(context, 'result'), '$years سنة، $months شهر، $days يوم', color: Colors.tealAccent, big: true),
-          ResultLine('إجمالي الأيام منذ الميلاد', '$totalDays يوم', color: Colors.blueAccent),
+          ResultLine(
+            tr(context, 'result'),
+            '$years ${tr(context, 'c_years_unit')}, $months ${tr(context, 'c_months_unit')}, $days ${tr(context, 'c_days_unit')}',
+            color: Colors.tealAccent,
+            big: true,
+          ),
+          ResultLine(tr(context, 'c_total_days_since_birth'), '$totalDays ${tr(context, 'c_days_unit')}', color: Colors.blueAccent),
         ];
         break;
       case 'c_date_diff':
         final diff = _dateB.difference(_dateA).inDays.abs();
         r = [
-          ResultLine(tr(context, 'result'), '$diff يوم', color: Colors.tealAccent, big: true),
-          ResultLine('بالأسابيع تقريبًا', '${(diff / 7).toStringAsFixed(1)} أسبوع', color: Colors.blueAccent),
-          ResultLine('بالأشهر تقريبًا', '${(diff / 30.44).toStringAsFixed(1)} شهر', color: Colors.orangeAccent),
+          ResultLine(tr(context, 'result'), '$diff ${tr(context, 'c_days_unit')}', color: Colors.tealAccent, big: true),
+          ResultLine(tr(context, 'c_weeks_approx'), '${(diff / 7).toStringAsFixed(1)} ${tr(context, 'c_weeks_unit')}', color: Colors.blueAccent),
+          ResultLine(tr(context, 'c_months_approx'), '${(diff / 30.44).toStringAsFixed(1)} ${tr(context, 'c_months_unit')}', color: Colors.orangeAccent),
         ];
         break;
       case 'c_gpa':
@@ -211,7 +216,7 @@ class _CalculationsTabState extends State<CalculationsTab> {
             AppNumberField(controller: _t2, label: tr(context, 'c_discount_pct'), onChanged: (_) => _calculate()),
           ],
           if (isPercentage) ...[
-            AppNumberField(controller: _t2, label: 'النسبة (%)', onChanged: (_) => _calculate()),
+            AppNumberField(controller: _t2, label: tr(context, 'c_percentage_label'), onChanged: (_) => _calculate()),
             const SizedBox(height: 15),
             AppNumberField(controller: _t1, label: tr(context, 'c_original_value'), onChanged: (_) => _calculate()),
           ],
@@ -234,9 +239,9 @@ class _CalculationsTabState extends State<CalculationsTab> {
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   children: [
-                    Expanded(child: AppNumberField(controller: _gradeCtrls[i], label: 'الدرجة (0-4)', onChanged: (_) => _calculate())),
+                    Expanded(child: AppNumberField(controller: _gradeCtrls[i], label: tr(context, 'c_grade_0_4'), onChanged: (_) => _calculate())),
                     const SizedBox(width: 8),
-                    Expanded(child: AppNumberField(controller: _creditCtrls[i], label: 'الساعات المعتمدة', onChanged: (_) => _calculate())),
+                    Expanded(child: AppNumberField(controller: _creditCtrls[i], label: tr(context, 'c_credit_hours'), onChanged: (_) => _calculate())),
                     IconButton(
                       onPressed: () => _removeGpaRow(i),
                       icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent),
@@ -249,7 +254,7 @@ class _CalculationsTabState extends State<CalculationsTab> {
               child: TextButton.icon(
                 onPressed: _addGpaRow,
                 icon: const Icon(Icons.add, color: Colors.tealAccent),
-                label: const Text('إضافة مادة', style: TextStyle(color: Colors.tealAccent)),
+                label: Text(tr(context, 'c_add_course'), style: const TextStyle(color: Colors.tealAccent)),
               ),
             ),
           ],

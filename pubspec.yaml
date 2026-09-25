@@ -11,6 +11,7 @@ dependencies:
   shared_preferences: ^2.3.0
   share_plus: ^9.0.0
   unity_ads_plugin: ^0.5.0
+  url_launcher: ^6.3.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -24,8 +25,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
 
 flutter_launcher_icons:
   image_path: "assets/app_icon.png"
   android: true
   ios: false
+  adaptive_icon_background: "#121212"
+  adaptive_icon_foreground: "assets/app_icon.png"

@@ -89,7 +89,7 @@ class _HealthTabState extends State<HealthTab> {
           bmr = (10 * w) + (6.25 * h) - (5 * age) - 161;
         }
         r = [
-          ResultLine(tr(context, 'h_bmr'), '${bmr.toStringAsFixed(0)} kcal/يوم', color: Colors.tealAccent, big: true),
+          ResultLine(tr(context, 'h_bmr'), '${bmr.toStringAsFixed(0)} ${tr(context, 'kcal_per_day')}', color: Colors.tealAccent, big: true),
         ];
         break;
       case 'h_calories':
@@ -103,8 +103,8 @@ class _HealthTabState extends State<HealthTab> {
         final maintain = bmr * factor;
         r = [
           ResultLine(tr(context, 'h_calories'), '${maintain.toStringAsFixed(0)} kcal', color: Colors.tealAccent, big: true),
-          ResultLine('فقدان الوزن (عجز 20%)', '${(maintain * 0.8).toStringAsFixed(0)} kcal', color: Colors.orangeAccent),
-          ResultLine('زيادة الوزن (فائض 15%)', '${(maintain * 1.15).toStringAsFixed(0)} kcal', color: Colors.greenAccent),
+          ResultLine(tr(context, 'h_weight_loss_label'), '${(maintain * 0.8).toStringAsFixed(0)} kcal', color: Colors.orangeAccent),
+          ResultLine(tr(context, 'h_weight_gain_label'), '${(maintain * 1.15).toStringAsFixed(0)} kcal', color: Colors.greenAccent),
         ];
         break;
       case 'h_ideal_weight':
@@ -138,21 +138,21 @@ class _HealthTabState extends State<HealthTab> {
       case 'h_water':
         final liters = w * 0.033;
         r = [
-          ResultLine(tr(context, 'h_water'), '${liters.toStringAsFixed(2)} لتر/يوم', color: Colors.blueAccent, big: true),
+          ResultLine(tr(context, 'h_water'), '${liters.toStringAsFixed(2)} ${tr(context, 'liters_per_day')}', color: Colors.blueAccent, big: true),
         ];
         break;
       case 'h_hba1c':
         final eag = (28.7 * e1) - 46.7;
         r = [
-          ResultLine('متوسط السكر التقديري', '${eag.toStringAsFixed(0)} mg/dL', color: Colors.tealAccent, big: true),
+          ResultLine(tr(context, 'h_avg_glucose'), '${eag.toStringAsFixed(0)} mg/dL', color: Colors.tealAccent, big: true),
         ];
         break;
       case 'h_heart_rate':
         final maxHr = 220 - age;
         r = [
-          ResultLine('أقصى معدل نبض', '${maxHr.toStringAsFixed(0)} نبضة/دقيقة', color: Colors.redAccent, big: true),
-          ResultLine('منطقة حرق الدهون (50-65%)', '${(maxHr * 0.5).toStringAsFixed(0)} - ${(maxHr * 0.65).toStringAsFixed(0)}', color: Colors.orangeAccent),
-          ResultLine('منطقة اللياقة القلبية (65-85%)', '${(maxHr * 0.65).toStringAsFixed(0)} - ${(maxHr * 0.85).toStringAsFixed(0)}', color: Colors.greenAccent),
+          ResultLine(tr(context, 'h_max_hr'), '${maxHr.toStringAsFixed(0)} ${tr(context, 'bpm_unit')}', color: Colors.redAccent, big: true),
+          ResultLine(tr(context, 'h_fat_burn_zone'), '${(maxHr * 0.5).toStringAsFixed(0)} - ${(maxHr * 0.65).toStringAsFixed(0)}', color: Colors.orangeAccent),
+          ResultLine(tr(context, 'h_cardio_zone'), '${(maxHr * 0.65).toStringAsFixed(0)} - ${(maxHr * 0.85).toStringAsFixed(0)}', color: Colors.greenAccent),
         ];
         break;
       case 'h_pregnancy':
@@ -160,8 +160,8 @@ class _HealthTabState extends State<HealthTab> {
         final dueInDays = 280 - daysPassed;
         final weeksPregnant = (daysPassed / 7).floor();
         r = [
-          ResultLine('الأسبوع الحالي تقريبًا', '$weeksPregnant أسبوع', color: Colors.pinkAccent, big: true),
-          ResultLine('الأيام المتبقية تقريبًا للولادة', dueInDays > 0 ? '$dueInDays يوم' : 'قريبًا جدًا', color: Colors.tealAccent),
+          ResultLine(tr(context, 'h_current_week'), '$weeksPregnant ${tr(context, 'week_unit')}', color: Colors.pinkAccent, big: true),
+          ResultLine(tr(context, 'h_days_remaining'), dueInDays > 0 ? '$dueInDays ${tr(context, 'day_unit')}' : tr(context, 'h_very_soon'), color: Colors.tealAccent),
         ];
         break;
     }

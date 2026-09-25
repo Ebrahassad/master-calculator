@@ -51,7 +51,7 @@ class AppStrings {
     'scientific_tooltip': {'ar': 'الآلة الحاسبة العلمية الهندسية', 'en': 'Scientific Calculator'},
 
     // القائمة الجانبية
-    'drawer_save_session': {'ar': 'حفظ الجلسة الحالية', 'en': 'Save Current Session'},
+    'drawer_save_session': {'ar': 'ملاحظاتي المحفوظة', 'en': 'My Saved Notes'},
     'drawer_history': {'ar': 'سجل الجلسات والعمليات', 'en': 'Session History'},
     'drawer_background': {'ar': 'تغيير الخلفية بألوان انتقائية', 'en': 'Change Background Color'},
     'drawer_language': {'ar': 'تغيير اللغة', 'en': 'Change Language'},
@@ -61,14 +61,24 @@ class AppStrings {
     'drawer_exit': {'ar': 'خروج من التطبيق', 'en': 'Exit App'},
     'drawer_version': {'ar': 'الإصدار', 'en': 'Version'},
     'drawer_contact': {'ar': 'تواصل معنا', 'en': 'Contact us'},
-    'session_saved': {'ar': '✅ تم حفظ الجلسة الحالية بنجاح في السجل', 'en': '✅ Current session saved successfully'},
-    'active_session': {'ar': 'جلسة حسابات مالية وصحية نشطة', 'en': 'Active finance & health session'},
     'pick_color': {'ar': 'اختر لون الخلفية', 'en': 'Choose Background Color'},
     'premium_theme': {'ar': 'ثيم ذهبي مميز 👑', 'en': 'Premium Gold Theme 👑'},
     'watch_ad_to_unlock': {'ar': 'شاهد إعلانًا قصيرًا لفتح هذا الثيم نهائيًا', 'en': 'Watch a short ad to unlock this theme forever'},
     'ad_not_ready_try_later': {'ar': 'الإعلان غير جاهز الآن، حاول بعد قليل', 'en': 'Ad not ready yet, please try again shortly'},
     'unlocked_now': {'ar': '🎉 تم فتح الثيم المميز بنجاح!', 'en': '🎉 Premium theme unlocked successfully!'},    'no_sessions': {'ar': 'لا توجد جلسات محفوظة حتى الآن', 'en': 'No saved sessions yet'},
     'clear_history': {'ar': 'مسح السجل', 'en': 'Clear History'},
+
+    // نافذة الملاحظات
+    'notes_title': {'ar': 'كتابة ملاحظة', 'en': 'Write a Note'},
+    'notes_hint': {'ar': 'اكتب ملاحظتك عن هذا الحساب هنا...', 'en': 'Write your note about this calculation here...'},
+    'notes_saved': {'ar': '✅ تم حفظ الملاحظة بنجاح', 'en': '✅ Note saved successfully'},
+    'notes_empty_error': {'ar': 'الرجاء كتابة نص قبل الحفظ', 'en': 'Please write some text before saving'},
+
+    // الشاشة الرئيسية (القائمة)
+    'landing_subtitle': {'ar': 'كل حاسباتك في مكان واحد', 'en': 'All your calculators in one place'},
+    'nav_scientific': {'ar': 'الحاسبة العلمية الشاملة', 'en': 'Scientific Calculator'},
+    'copyright_text': {'ar': '© 2026 جميع الحقوق محفوظة', 'en': '© 2026 All Rights Reserved'},
+    'developer_by': {'ar': 'تطوير: HASSADI', 'en': 'Developed by: HASSADI'},
 
     // حول التطبيق
     'about_desc': {
@@ -167,6 +177,20 @@ class AppStrings {
     'h_status_normal': {'ar': 'وزن مثالي ورائع', 'en': 'Normal - Great!'},
     'h_status_over': {'ar': 'زيادة في الوزن', 'en': 'Overweight'},
     'h_status_obese': {'ar': 'سمنة مفرطة', 'en': 'Obese'},
+    'kcal_per_day': {'ar': 'كالوري/يوم', 'en': 'kcal/day'},
+    'h_weight_loss_label': {'ar': 'فقدان الوزن (عجز 20%)', 'en': 'Weight loss (20% deficit)'},
+    'h_weight_gain_label': {'ar': 'زيادة الوزن (فائض 15%)', 'en': 'Weight gain (15% surplus)'},
+    'liters_per_day': {'ar': 'لتر/يوم', 'en': 'liters/day'},
+    'h_avg_glucose': {'ar': 'متوسط السكر التقديري', 'en': 'Estimated Average Glucose'},
+    'h_max_hr': {'ar': 'أقصى معدل نبض', 'en': 'Maximum Heart Rate'},
+    'bpm_unit': {'ar': 'نبضة/دقيقة', 'en': 'bpm'},
+    'h_fat_burn_zone': {'ar': 'منطقة حرق الدهون (50-65%)', 'en': 'Fat Burn Zone (50-65%)'},
+    'h_cardio_zone': {'ar': 'منطقة اللياقة القلبية (65-85%)', 'en': 'Cardio Zone (65-85%)'},
+    'h_current_week': {'ar': 'الأسبوع الحالي تقريبًا', 'en': 'Approx. Current Week'},
+    'week_unit': {'ar': 'أسبوع', 'en': 'week'},
+    'h_days_remaining': {'ar': 'الأيام المتبقية تقريبًا للولادة', 'en': 'Approx. Days Until Due Date'},
+    'day_unit': {'ar': 'يوم', 'en': 'day'},
+    'h_very_soon': {'ar': 'قريبًا جدًا', 'en': 'Very soon'},
 
     // تبويب الحسابات العامة
     'c_discount': {'ar': 'حاسبة الخصم والنسبة (Discount)', 'en': 'Discount Calculator'},
@@ -188,6 +212,18 @@ class AppStrings {
     'c_day': {'ar': 'اليوم', 'en': 'Day'},
     'c_month': {'ar': 'الشهر', 'en': 'Month'},
     'c_year': {'ar': 'السنة', 'en': 'Year'},
+    'c_percentage_of': {'ar': 'من', 'en': 'of'},
+    'c_years_unit': {'ar': 'سنة', 'en': 'years'},
+    'c_total_days_since_birth': {'ar': 'إجمالي الأيام منذ الميلاد', 'en': 'Total days since birth'},
+    'c_days_unit': {'ar': 'يوم', 'en': 'days'},
+    'c_weeks_approx': {'ar': 'بالأسابيع تقريبًا', 'en': 'Approx. in weeks'},
+    'c_weeks_unit': {'ar': 'أسبوع', 'en': 'weeks'},
+    'c_months_approx': {'ar': 'بالأشهر تقريبًا', 'en': 'Approx. in months'},
+    'c_months_unit': {'ar': 'شهر', 'en': 'months'},
+    'c_percentage_label': {'ar': 'النسبة (%)', 'en': 'Percentage (%)'},
+    'c_grade_0_4': {'ar': 'الدرجة (0-4)', 'en': 'Grade (0-4)'},
+    'c_credit_hours': {'ar': 'الساعات المعتمدة', 'en': 'Credit hours'},
+    'c_add_course': {'ar': 'إضافة مادة', 'en': 'Add course'},
 
     // الآلة الحاسبة العلمية
     'sci_deg': {'ar': 'درجات', 'en': 'DEG'},
@@ -200,5 +236,16 @@ class AppStrings {
     'close': {'ar': 'إغلاق', 'en': 'Close'},
     'cancel': {'ar': 'إلغاء', 'en': 'Cancel'},
     'ok': {'ar': 'موافق', 'en': 'OK'},
+    'error_open_link': {'ar': 'تعذر فتح الرابط', 'en': 'Could not open the link'},
+    'share_app_message': {
+      'ar': 'جرّب تطبيق موسوعة الحاسبات الشاملة — موسوعة حاسبات مالية وصحية وهندسية وتحويلات لحظية شاملة!',
+      'en': 'Try Master Calculator Hub — a full suite of finance, health, scientific and instant conversion calculators!'
+    },
+    'theme_dark_original': {'ar': 'داكن أصلي', 'en': 'Original Dark'},
+    'theme_navy_dark': {'ar': 'كحلي داكن', 'en': 'Dark Navy'},
+    'theme_deep_night': {'ar': 'ليلي عميق', 'en': 'Deep Night'},
+    'theme_dark_green': {'ar': 'أخضر داكن', 'en': 'Dark Green'},
+    'theme_royal_purple': {'ar': 'بنفسجي ملكي', 'en': 'Royal Purple'},
+    'theme_graphite_gray': {'ar': 'رمادي غرافيت', 'en': 'Graphite Gray'},
   };
 }
