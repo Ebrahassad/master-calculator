@@ -106,14 +106,14 @@ class AboutScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const Spacer(),
 
             // ===== COPYRIGHT + WEBSITE =====
             const DeveloperLink(
               compact: false,
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
           ],
         ),
       ),

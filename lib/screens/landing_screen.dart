@@ -33,11 +33,10 @@ class LandingScreen extends StatelessWidget {
           // ===== خلفية زخرفية: رموز حسابية شفافة خلف كل المحتوى =====
           const Positioned.fill(child: MathSymbolsBackground()),
           SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+            child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 22,
-                vertical: 6,
+                vertical: 2,
               ),
               child: Column(
                 children: [
@@ -54,7 +53,7 @@ class LandingScreen extends StatelessWidget {
                       const _LanguageButton(),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 10),
                   // ===== الشعار + اسم التطبيق =====
                   ClipRRect(
                     borderRadius: BorderRadius.circular(24),
@@ -90,7 +89,7 @@ class LandingScreen extends StatelessWidget {
                     tr(context, 'landing_subtitle'),
                     style: const TextStyle(color: Colors.white54, fontSize: 13),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 10),
                   // ===== أزرار التنقل الرئيسية =====
                   _MenuButton(
                     icon: Icons.functions,
@@ -99,7 +98,7 @@ class LandingScreen extends StatelessWidget {
                     onTap: () =>
                         _go(context, (_) => const ScientificCalculatorScreen()),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   _MenuButton(
                     icon: Icons.swap_horiz_rounded,
                     label: tr(context, 'nav_convert'),
@@ -115,7 +114,7 @@ class LandingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   _MenuButton(
                     icon: Icons.favorite_rounded,
                     label: tr(context, 'nav_health'),
@@ -131,7 +130,7 @@ class LandingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   _MenuButton(
                     icon: Icons.calculate_rounded,
                     label: tr(context, 'nav_calc'),
@@ -147,7 +146,7 @@ class LandingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   _MenuButton(
                     icon: Icons.attach_money_rounded,
                     label: tr(context, 'nav_money'),
@@ -163,12 +162,13 @@ class LandingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 10),
+                  const Spacer(),
                   // ===== تذييل الشاشة: الحقوق + المطوّر =====
                   const DeveloperLink(
                     compact: false,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                 ],
               ),
             ),

@@ -70,20 +70,17 @@ class DeveloperLink extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              '${tr(context, 'copyright_text')} • $kDeveloperName',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: compact ? 12 : 13,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                '${tr(context, 'copyright_text')}\n$kDeveloperName',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: compact ? 12 : 13,
+                  fontWeight: FontWeight.w600,
+                  height: 1.35,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(width: 5),
-            const Icon(
-              Icons.open_in_new_rounded,
-              color: Colors.tealAccent,
-              size: 15,
             ),
           ],
         ),

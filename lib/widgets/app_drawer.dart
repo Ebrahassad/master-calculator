@@ -131,7 +131,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () => SystemNavigator.pop(),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 10, 8, 16),
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
             child: Column(
               children: [
                 Text(
@@ -141,8 +141,10 @@ class AppDrawer extends StatelessWidget {
                     fontSize: 12,
                   ),
                 ),
-                const SizedBox(height: 4),
-                const DeveloperLink(),
+                const SizedBox(height: 8),
+                const DeveloperLink(
+                  compact: false,
+                ),
               ],
             ),
           ),
